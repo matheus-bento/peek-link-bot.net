@@ -28,6 +28,8 @@ namespace PeekLinkBot
                 .ConfigureServices((context, services) =>
                 {
                     services.AddOptions();
+                    services.AddHttpClient();
+
                     services.Configure<PeekLinkBotConfig>(context.Configuration.GetSection("PeekLinkBot"));
                     services.AddSingleton<IHostedService, PeekLinkBotService>();
                 })
