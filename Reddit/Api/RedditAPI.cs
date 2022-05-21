@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
 
 namespace PeekLinkBot.Reddit.Api
 {
@@ -30,7 +31,7 @@ namespace PeekLinkBot.Reddit.Api
                 new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        public async Task<RedditJson<Listing<RedditJson<Message>>>> GetUnreadMessages()
+        public async Task<IEnumerable<RedditJson<Message>>> GetUnreadMessages()
         {
             HttpResponseMessage response = await this._redditHttpClient.GetAsync("/message/unread");
 
@@ -41,7 +42,7 @@ namespace PeekLinkBot.Reddit.Api
 
             response.EnsureSuccessStatusCode();
 
-            var unreadMessages =
+            var unreadMessagesListing =
                 JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
                     await response.Content.ReadAsStringAsync(),
                     new JsonSerializerSettings
@@ -52,7 +53,7 @@ namespace PeekLinkBot.Reddit.Api
                         }
                     });
 
-            return unreadMessages;
+            return unreadMessagesListing.Data.Children;
         }
     }
 }
