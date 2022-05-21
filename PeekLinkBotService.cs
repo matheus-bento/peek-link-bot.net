@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PeekLinkBot.Reddit.Api.Model;
+using Newtonsoft.Json;
 
 namespace PeekLinkBot
 {
@@ -49,7 +51,7 @@ namespace PeekLinkBot
             this._logger.LogDebug("Informed password: {0}", this._config.Value.Password);
             this._logger.LogDebug("Service started");
 
-            this._hostApplicationLifetime.ApplicationStarted.Register(this.OnServiceStarted);
+            this._hostApplicationLifetime.ApplicationStarted.Register(async () => await this.OnServiceStarted());
 
             return Task.CompletedTask;
         }
@@ -61,16 +63,18 @@ namespace PeekLinkBot
             return Task.CompletedTask;
         }
 
-        private void OnServiceStarted()
+        private async Task OnServiceStarted()
         {
             try
             {
                 string accessToken = this._auth.GetAccessToken().Result.AccessToken;
+                var redditApi = new RedditAPI(this._httpClientFactory, this._logger, accessToken);
 
-                new RedditAPI(
-                    this._httpClientFactory,
-                    this._logger,
-                    accessToken).GetUnreadMessages().Wait();
+                await foreach (Message message in redditApi.GetUnreadMessages())
+                {
+                    this._logger.LogDebug(
+                        "Message logged: {0}", JsonConvert.SerializeObject(message, Formatting.Indented));
+                }
             }
             catch (HttpRequestException httpRequestException)
             {
