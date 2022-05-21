@@ -8,7 +8,7 @@ namespace PeekLinkBot.Reddit.Api.Model
     /// <summary>
     ///     Information from a given user account returned by the /api/v1/me endpoint.
     /// </summary>
-    public class RedditUserIdentity
+    public class Redditor
     {
         public bool IsEmployee { get; set; }
         public bool SeenLayoutSwitch { get; set; }

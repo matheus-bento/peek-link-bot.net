@@ -70,7 +70,7 @@ namespace PeekLinkBot
                 new RedditAPI(
                     this._httpClientFactory,
                     this._logger,
-                    accessToken).GetAccountInfo().Wait();
+                    accessToken).GetUnreadMessages().Wait();
             }
             catch (HttpRequestException httpRequestException)
             {
