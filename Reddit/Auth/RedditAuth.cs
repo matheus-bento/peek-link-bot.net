@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace PeekLinkBot.Reddit.Auth
 {
+    /// <summary>
+    ///     Class with access to reddit's authentication endpoints using the client credentials grant type
+    /// </summary>
     public class RedditAuth
     {
         private readonly ILogger<PeekLinkBotService> _logger;
@@ -51,6 +54,9 @@ namespace PeekLinkBot.Reddit.Auth
             return Convert.ToBase64String(credsBytes);
         }
 
+        /// <summary>
+        ///     Retrieves the access token to access the bot account
+        /// </summary>
         public async Task<AccessTokenResponseContent> GetAccessToken()
         {
             HttpResponseMessage response =

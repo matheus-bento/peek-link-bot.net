@@ -11,10 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace PeekLinkBot.Reddit.Api
 {
+    /// <summary>
+    ///     Class that retrieves information from the bot's reddit account
+    /// </summary>
     public class RedditAPI
     {
-        private readonly Uri BASE_REDDIT_URI = new Uri("https://oauth.reddit.com/");
-
         private readonly ILogger<PeekLinkBotService> _logger;
         private readonly HttpClient _redditHttpClient;
 
@@ -30,6 +31,9 @@ namespace PeekLinkBot.Reddit.Api
                 new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
+        /// <summary>
+        ///     Retrieves informations about the bot's account
+        /// </summary>
         public async Task<RedditUserIdentity> GetAccountInfo()
         {
             HttpResponseMessage response = await this._redditHttpClient.GetAsync("/api/v1/me");

@@ -2,6 +2,9 @@
 
 namespace PeekLinkBot.Reddit.Api.Model
 {
+    /// <summary>
+    ///     Information from a subreddit
+    /// </summary>
     public class Subreddit
     {
         public bool DefaultSet { get; set; }
