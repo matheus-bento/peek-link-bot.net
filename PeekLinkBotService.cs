@@ -45,8 +45,8 @@ namespace PeekLinkBot
         public Task StartAsync(CancellationToken cancellationToken)
         {
             this._logger.LogDebug("Service started");
-            this._logger.LogDebug("Informed username: " + this._config.Value.Username);
-            this._logger.LogDebug("Informed password: " + this._config.Value.Password);
+            this._logger.LogDebug("Informed username: {0}", this._config.Value.Username);
+            this._logger.LogDebug("Informed password: {0}", this._config.Value.Password);
             this._logger.LogDebug("Service started");
 
             this._hostApplicationLifetime.ApplicationStarted.Register(this.OnServiceStarted);
