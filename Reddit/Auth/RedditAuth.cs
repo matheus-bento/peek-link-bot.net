@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 
 namespace PeekLinkBot.Reddit.Auth
 {
@@ -22,8 +23,6 @@ namespace PeekLinkBot.Reddit.Auth
 
         private readonly string _username;
         private readonly string _password;
-        private readonly string _clientID;
-        private readonly string _secret;
 
         public RedditAuth(
             IHttpClientFactory httpClientFactory,
@@ -36,22 +35,15 @@ namespace PeekLinkBot.Reddit.Auth
             this._logger = logger;
 
             this._redditAuthHttpClient = httpClientFactory.CreateClient("RedditAuth");
-            
+
+            // Sets the Authorization header according to reddit's specification.
+            // Reference: https://github.com/reddit-archive/reddit/wiki/OAuth2#retrieving-the-access-token
+            byte[] credentialsBytes = Encoding.ASCII.GetBytes(clientID + ":" + secret);
+            this._redditAuthHttpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic", Convert.ToBase64String(credentialsBytes));
+
             this._username = username;
             this._password = password;
-            
-            this._clientID = clientID;
-            this._secret = secret;
-        }
-
-        // Reddit's authorization endpoint requires an Authorization header
-        // with identification for the client that will access the API,
-        // using the client ID as the username and the secret as the password
-        // informed using basic authentication
-        private string GetBase64Credentials()
-        {
-            byte[] credsBytes = Encoding.ASCII.GetBytes(this._clientID + ":" + this._secret);
-            return Convert.ToBase64String(credsBytes);
         }
 
         /// <summary>
@@ -78,9 +70,11 @@ namespace PeekLinkBot.Reddit.Auth
             this._logger.LogDebug("Response: {0}", response);
             this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
 
+            response.EnsureSuccessStatusCode();
+
             AccessTokenResponseContent content = 
                 JsonConvert.DeserializeObject<AccessTokenResponseContent>(
-                    response.Content.ReadAsStringAsync().Result,
+                    await response.Content.ReadAsStringAsync(),
                     new JsonSerializerSettings
                     {
                         ContractResolver = new DefaultContractResolver
