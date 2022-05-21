@@ -1,5 +1,5 @@
-﻿using PeekLinkBot.Reddit;
-using PeekLinkBot.Auth;
+﻿using PeekLinkBot.Reddit.Api;
+using PeekLinkBot.Reddit.Auth;
 
 using System.Net.Http;
 using System.Threading;
@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PeekLinkBot.Reddit.Model;
-using Newtonsoft.Json;
 
 namespace PeekLinkBot
 {

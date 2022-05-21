@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace PeekLinkBot.Reddit.Converters
+namespace PeekLinkBot.Reddit.Api.Converters
 {
     /// <summary>
     ///     Reddit API's timestamps are floating point numbers and, for some reason, 

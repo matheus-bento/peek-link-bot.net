@@ -1,4 +1,4 @@
-﻿namespace PeekLinkBot.Auth.Model
+﻿namespace PeekLinkBot.Reddit.Auth.Model
 {
     public class AccessTokenResponseContent
     {

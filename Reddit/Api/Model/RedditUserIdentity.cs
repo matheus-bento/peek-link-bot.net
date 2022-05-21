@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using PeekLinkBot.Reddit.Converters;
+using PeekLinkBot.Reddit.Api.Converters;
 using System;
 using System.Collections.Generic;
 
-namespace PeekLinkBot.Reddit.Model
+namespace PeekLinkBot.Reddit.Api.Model
 {
     public class RedditUserIdentity
     {

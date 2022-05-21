@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PeekLinkBot.Reddit.Model
+namespace PeekLinkBot.Reddit.Api.Model
 {
     public class Subreddit
     {

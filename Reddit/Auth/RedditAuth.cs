@@ -1,9 +1,8 @@
-﻿using PeekLinkBot.Auth.Model;
+﻿using PeekLinkBot.Reddit.Auth.Model;
 
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -11,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace PeekLinkBot.Auth
+namespace PeekLinkBot.Reddit.Auth
 {
     public class RedditAuth
     {

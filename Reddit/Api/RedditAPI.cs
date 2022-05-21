@@ -1,4 +1,4 @@
-﻿using PeekLinkBot.Reddit.Model;
+﻿using PeekLinkBot.Reddit.Api.Model;
 
 using System;
 using System.Net.Http;
@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace PeekLinkBot.Reddit
+namespace PeekLinkBot.Reddit.Api
 {
     public class RedditAPI
     {
