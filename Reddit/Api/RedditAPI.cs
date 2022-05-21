@@ -34,6 +34,25 @@ namespace PeekLinkBot.Reddit.Api
                 new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
+        private async Task MarkMessageAsRead(Message message)
+        {
+            HttpResponseMessage response =
+                await this._redditHttpClient.PostAsync(
+                    "/api/read_message",
+                    new FormUrlEncodedContent(
+                        new Dictionary<string, string>
+                        {
+                            { "id", message.Name }
+                        }
+                    ));
+
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
+            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+            this._logger.LogDebug("Response: {0}", response);
+
+            response.EnsureSuccessStatusCode();
+        }
+
         public async IAsyncEnumerable<Message> GetUnreadMessages()
         {
             int attempts = 0;
@@ -65,7 +84,10 @@ namespace PeekLinkBot.Reddit.Api
                 {
                     foreach (RedditJson<Message> messageWrapper in unreadMessagesListing.Data.Children)
                     {
-                        yield return messageWrapper.Data;
+                        Message message = messageWrapper.Data;
+                        await MarkMessageAsRead(message);
+
+                        yield return message;
                     }
                 }
                 else
