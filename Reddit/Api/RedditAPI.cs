@@ -53,7 +53,7 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
         }
 
-        public async IAsyncEnumerable<Message> GetUnreadMessages()
+        public async IAsyncEnumerable<Message> GetUnreadMentions()
         {
             int attempts = 0;
             int requestInterval = 1;
@@ -80,9 +80,12 @@ namespace PeekLinkBot.Reddit.Api
                             }
                         });
 
-                if (unreadMessagesListing.Data.Children.Count() > 0)
+                var unreadMentions =
+                    unreadMessagesListing.Data.Children.Where(json => json.Data.Type == "username_mention");
+
+                if (unreadMentions.Count() > 0)
                 {
-                    foreach (RedditJson<Message> messageWrapper in unreadMessagesListing.Data.Children)
+                    foreach (RedditJson<Message> messageWrapper in unreadMentions)
                     {
                         Message message = messageWrapper.Data;
                         await MarkMessageAsRead(message);

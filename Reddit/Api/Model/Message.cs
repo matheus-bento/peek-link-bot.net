@@ -19,6 +19,7 @@ namespace PeekLinkBot.Reddit.Api.Model
         /// </summary>
         public string Name { get; set; }
         public string Subject { get; set; }
+        public string Type { get; set; }
         /// <summary>
         ///    Defines whether or not the message is a comment reply
         /// </summary>

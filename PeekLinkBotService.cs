@@ -70,7 +70,7 @@ namespace PeekLinkBot
                 string accessToken = this._auth.GetAccessToken().Result.AccessToken;
                 var redditApi = new RedditAPI(this._httpClientFactory, this._logger, accessToken);
 
-                await foreach (Message message in redditApi.GetUnreadMessages())
+                await foreach (Message message in redditApi.GetUnreadMentions())
                 {
                     this._logger.LogDebug(
                         "Message logged: {0}", JsonConvert.SerializeObject(message, Formatting.Indented));
