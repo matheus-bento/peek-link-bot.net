@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System;
+using System.Net.Http.Headers;
 
 namespace PeekLinkBot
 {
@@ -28,7 +30,24 @@ namespace PeekLinkBot
                 .ConfigureServices((context, services) =>
                 {
                     services.AddOptions();
-                    services.AddHttpClient();
+
+                    services.AddHttpClient("Reddit", httpClient =>
+                    {
+                        httpClient.BaseAddress = new Uri("https://oauth.reddit.com");
+                        httpClient
+                            .DefaultRequestHeaders
+                            .UserAgent
+                            .Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
+                    });
+
+                    services.AddHttpClient("RedditAuth", httpClient =>
+                    {
+                        httpClient.BaseAddress = new Uri("https://www.reddit.com");
+                        httpClient
+                            .DefaultRequestHeaders
+                            .UserAgent
+                            .Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
+                    });
 
                     services.Configure<PeekLinkBotConfig>(context.Configuration.GetSection("PeekLinkBot"));
                     services.AddSingleton<IHostedService, PeekLinkBotService>();

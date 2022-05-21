@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace PeekLinkBot.Reddit
 {
@@ -13,29 +15,33 @@ namespace PeekLinkBot.Reddit
     {
         private readonly Uri BASE_REDDIT_URI = new Uri("https://oauth.reddit.com/");
 
-        private readonly HttpClient _httpClient;
-        private readonly string _accessToken;
+        private readonly ILogger<PeekLinkBotService> _logger;
+        private readonly HttpClient _redditHttpClient;
 
-        public RedditAPI(HttpClient httpClient, string accessToken)
+        public RedditAPI(
+            IHttpClientFactory httpClientFactory,
+            ILogger<PeekLinkBotService> logger,
+            string accessToken)
         {
-            this._httpClient = httpClient;
-            this._accessToken = accessToken;
+            this._logger = logger;
+
+            this._redditHttpClient = httpClientFactory.CreateClient("Reddit");
+            this._redditHttpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        public RedditUserIdentity GetAccountInfo()
+        public async Task<RedditUserIdentity> GetAccountInfo()
         {
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri(this.BASE_REDDIT_URI, "/api/v1/me"),
-                Method = HttpMethod.Get
-            };
+            HttpResponseMessage response = await this._redditHttpClient.GetAsync("/api/v1/me");
 
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", this._accessToken);
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
+            
+            this._logger.LogDebug("Response: {0}", response);
+            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
 
-            HttpResponseMessage response = this._httpClient.Send(request);
+            response.EnsureSuccessStatusCode();
 
-            RedditUserIdentity content = 
+            var acctInfo =
                 JsonConvert.DeserializeObject<RedditUserIdentity>(
                     response.Content.ReadAsStringAsync().Result,
                     new JsonSerializerSettings 
@@ -46,7 +52,7 @@ namespace PeekLinkBot.Reddit
                         }
                     });
 
-            return content;
+            return acctInfo;
         }
     }
 }

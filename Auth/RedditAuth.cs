@@ -8,27 +8,32 @@ using System.Text;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace PeekLinkBot.Auth
 {
     public class RedditAuth
     {
-        private HttpClient _httpClient;
+        private readonly ILogger<PeekLinkBotService> _logger;
+        private readonly HttpClient _redditAuthHttpClient;
 
-        private string _username;
-        private string _password;
-        
-        private string _clientID;
-        private string _secret;
+        private readonly string _username;
+        private readonly string _password;
+        private readonly string _clientID;
+        private readonly string _secret;
 
         public RedditAuth(
-            HttpClient httpClient,
+            IHttpClientFactory httpClientFactory,
+            ILogger<PeekLinkBotService> logger,
             string username,
             string password,
             string clientID,
             string secret)
         {
-            this._httpClient = httpClient;
+            this._logger = logger;
+
+            this._redditAuthHttpClient = httpClientFactory.CreateClient("RedditAuth");
             
             this._username = username;
             this._password = password;
@@ -37,13 +42,21 @@ namespace PeekLinkBot.Auth
             this._secret = secret;
         }
 
-        public AccessTokenResponseContent GetAccessToken()
+        // Reddit's authorization endpoint requires an Authorization header
+        // with identification for the client that will access the API,
+        // using the client ID as the username and the secret as the password
+        // informed using basic authentication
+        private string GetBase64Credentials()
         {
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri("https://www.reddit.com/api/v1/access_token"),
-                Method = HttpMethod.Post,
-                Content = 
+            byte[] credsBytes = Encoding.ASCII.GetBytes(this._clientID + ":" + this._secret);
+            return Convert.ToBase64String(credsBytes);
+        }
+
+        public async Task<AccessTokenResponseContent> GetAccessToken()
+        {
+            HttpResponseMessage response =
+                await this._redditAuthHttpClient.PostAsync(
+                    "/api/v1/access_token",
                     new FormUrlEncodedContent(
                         new Dictionary<string, string>
                         {
@@ -51,15 +64,14 @@ namespace PeekLinkBot.Auth
                             { "username", this._username },
                             { "password", this._password }
                         }
-                    ),
-            };
+                    )
+                );
 
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", GetBase64Credentials());
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
+            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
 
-            HttpResponseMessage response = this._httpClient.Send(request);
-
-            response.EnsureSuccessStatusCode();
+            this._logger.LogDebug("Response: {0}", response);
+            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
 
             AccessTokenResponseContent content = 
                 JsonConvert.DeserializeObject<AccessTokenResponseContent>(
@@ -74,16 +86,6 @@ namespace PeekLinkBot.Auth
                 );
 
             return content;
-        }
-
-        // Reddit's authorization endpoint requires an Authorization header
-        // with identification for the client that will access the API,
-        // using the client ID as the username and the secret as the password
-        // informed using basic authentication
-        private string GetBase64Credentials()
-        {
-            byte[] credsBytes = Encoding.ASCII.GetBytes(this._clientID + ":" + this._secret);
-            return Convert.ToBase64String(credsBytes);
         }
     }
 }

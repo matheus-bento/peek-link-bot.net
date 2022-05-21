@@ -16,26 +16,27 @@ namespace PeekLinkBot
     public class PeekLinkBotService : IHostedService
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly ILogger _logger;
+        private readonly ILogger<PeekLinkBotService> _logger;
         private readonly IOptions<PeekLinkBotConfig> _config;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         private RedditAuth _auth;
 
         public PeekLinkBotService(
             IHostApplicationLifetime hostApplicationLifetime,
-            ILogger<PeekLinkBotService> logger,
+            IHttpClientFactory httpClientFactory,
             IOptions<PeekLinkBotConfig> config,
-            HttpClient httpClient)
+            ILogger<PeekLinkBotService> logger)
         {
             this._hostApplicationLifetime = hostApplicationLifetime;
-            this._logger = logger;
+            this._httpClientFactory = httpClientFactory;
             this._config = config;
-            this._httpClient = httpClient;
+            this._logger = logger;
 
             this._auth =
                 new RedditAuth(
-                    this._httpClient,
+                    this._httpClientFactory,
+                    this._logger,
                     this._config.Value.Username,
                     this._config.Value.Password,
                     this._config.Value.ClientID,
@@ -66,12 +67,12 @@ namespace PeekLinkBot
         {
             try
             {
-                RedditUserIdentity acctInfo = new RedditAPI(
-                    this._httpClient,
-                    this._auth.GetAccessToken().AccessToken
-                ).GetAccountInfo();
+                string accessToken = this._auth.GetAccessToken().Result.AccessToken;
 
-                this._logger.LogDebug("Account Info: " + JsonConvert.SerializeObject(acctInfo, Formatting.Indented));
+                new RedditAPI(
+                    this._httpClientFactory,
+                    this._logger,
+                    accessToken).GetAccountInfo().Wait();
             }
             catch (HttpRequestException httpRequestException)
             {
