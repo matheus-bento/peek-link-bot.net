@@ -18,5 +18,5 @@ After you register the application, add the following informations into your env
 And then run the service with the following command:
 
 ``` bash
-    dotnet run ./bin/Debug/net6.0/PeekLinkBot.dll
+    dotnet run
 ```
