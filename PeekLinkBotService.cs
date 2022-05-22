@@ -87,7 +87,7 @@ namespace PeekLinkBot
                             "^(beep bop I'm /u/peek-link-bot, your friendly bot " +
                             "that checks links beforehand so you don't get bamboozled\n" +
                             "Help me to improve by contributing on) " +
-                            "[^github](https://github.com/matheus-bento/peek-link-bot-v2) ^:)",
+                            "^[github](https://github.com/matheus-bento/peek-link-bot-v2) ^:)",
                             String.Join('\n', linksInfo));
 
                         this._logger.LogDebug("Message reply: {0}", reply);
