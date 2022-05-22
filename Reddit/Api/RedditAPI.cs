@@ -53,6 +53,32 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
         }
 
+        public async Task<Message> GetMessageById(string messageId)
+        {
+            HttpResponseMessage response =
+                await this._redditHttpClient.GetAsync(
+                    String.Format("/api/info?id={0}", messageId));
+
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
+
+            this._logger.LogDebug("Response: {0}", response);
+            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
+
+            var messageListing =
+                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
+                        await response.Content.ReadAsStringAsync());
+
+            if (messageListing.Data.Children.Count() > 0)
+            {
+                Message message = messageListing.Data.Children.First().Data;
+                return message;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async IAsyncEnumerable<Message> GetUnreadMentions()
         {
             int attempts = 0;

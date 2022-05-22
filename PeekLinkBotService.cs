@@ -72,8 +72,13 @@ namespace PeekLinkBot
 
                 await foreach (Message message in redditApi.GetUnreadMentions())
                 {
-                    this._logger.LogDebug(
-                        "Message logged: {0}", JsonConvert.SerializeObject(message, Formatting.Indented));
+                    // Getting the comment/post targeted by the username mention that calls the bot
+                    var targetMessage = await redditApi.GetMessageById(message.ParentId);
+
+                    if (targetMessage != null)
+                    {
+                        this._logger.LogDebug("Message to peek into: \"{0}\"", targetMessage.Body);
+                    }
                 }
             }
             catch (HttpRequestException httpRequestException)
