@@ -79,6 +79,27 @@ namespace PeekLinkBot.Reddit.Api
             }
         }
 
+        public async Task PostComment(string repliedMessageFullname, string text)
+        {
+            HttpResponseMessage response =
+                await this._redditHttpClient.PostAsync(
+                    "/api/comment",
+                    new FormUrlEncodedContent(
+                        new Dictionary<string, string>
+                        {
+                            { "api_type", "json" },
+                            { "text", text },
+                            { "thing_id", repliedMessageFullname },
+                        }
+                    ));
+
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
+            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+            this._logger.LogDebug("Response: {0}", response);
+
+            response.EnsureSuccessStatusCode();
+        }
+
         public async IAsyncEnumerable<Message> GetUnreadMentions()
         {
             int attempts = 0;

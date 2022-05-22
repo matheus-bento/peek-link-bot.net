@@ -88,6 +88,8 @@ namespace PeekLinkBot
                             "that checks links beforehand so you don't get bamboozled)", String.Join('\n', linksInfo));
 
                         this._logger.LogDebug("Message reply: {0}", reply);
+
+                        await redditApi.PostComment(message.Name, reply);
                     }
                 }
             }
