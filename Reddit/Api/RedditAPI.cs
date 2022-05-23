@@ -34,7 +34,7 @@ namespace PeekLinkBot.Reddit.Api
                 new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        private async Task MarkMessageAsRead(Message message)
+        public async Task MarkMessageAsRead(Message message)
         {
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
@@ -135,8 +135,6 @@ namespace PeekLinkBot.Reddit.Api
                     foreach (RedditJson<Message> messageWrapper in unreadMentions)
                     {
                         Message message = messageWrapper.Data;
-                        await MarkMessageAsRead(message);
-
                         yield return message;
                     }
                 }

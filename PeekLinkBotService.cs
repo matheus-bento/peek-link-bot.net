@@ -95,6 +95,8 @@ namespace PeekLinkBot
                             await redditApi.PostComment(message.Name, reply);
                         }
                     }
+
+                    await redditApi.MarkMessageAsRead(message);
                 }
             }
             catch (HttpRequestException httpRequestException)
