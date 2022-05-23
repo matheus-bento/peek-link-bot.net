@@ -12,6 +12,7 @@ using PeekLinkBot.Reddit.Api.Model;
 using PeekLinkBot.Reddit;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace PeekLinkBot
 {
@@ -79,20 +80,20 @@ namespace PeekLinkBot
 
                     if (targetMessage != null)
                     {
-                        this._logger.LogDebug("Message to peek into: \"{0}\"", targetMessage.Body);
-
                         IEnumerable<string> linksInfo = await CommentHandler.GetLinksInfo(targetMessage.Body);
-                        string reply = String.Format(
-                            "\n{0}\n" +
-                            "^(beep bop I'm /u/peek-link-bot, your friendly bot " +
-                            "that checks links beforehand so you don't get bamboozled\n" +
-                            "Help me to improve by contributing on) " +
-                            "^[github](https://github.com/matheus-bento/peek-link-bot-v2) ^:)",
-                            String.Join('\n', linksInfo));
 
-                        this._logger.LogDebug("Message reply: {0}", reply);
+                        if (linksInfo.Count() > 0)
+                        {
+                            string reply = String.Format(
+                                "\n{0}\n" +
+                                "^(beep bop I'm /u/peek-link-bot, your friendly bot " +
+                                "that checks links beforehand so you don't get bamboozled. " +
+                                "Help me to improve by contributing on) " +
+                                "^[github](https://github.com/matheus-bento/peek-link-bot-v2) ^:)",
+                                String.Join('\n', linksInfo));
 
-                        await redditApi.PostComment(message.Name, reply);
+                            await redditApi.PostComment(message.Name, reply);
+                        }
                     }
                 }
             }
