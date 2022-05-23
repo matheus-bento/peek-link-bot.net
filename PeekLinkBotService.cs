@@ -13,6 +13,7 @@ using PeekLinkBot.Reddit;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using PeekLinkBot.Reddit.Scrapper.Exceptions;
 
 namespace PeekLinkBot
 {
@@ -102,6 +103,10 @@ namespace PeekLinkBot
             catch (HttpRequestException httpRequestException)
             {
                 this._logger.LogError(httpRequestException, "An error occurred during the request to the reddit API");
+            }
+            catch (DocumentScrapingException scrapingException)
+            {
+                this._logger.LogError(scrapingException, "An error occured while scraping a document");
             }
         }
     }
