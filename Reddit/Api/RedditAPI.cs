@@ -71,6 +71,11 @@ namespace PeekLinkBot.Reddit.Api
             if (messageListing.Data.Children.Count() > 0)
             {
                 Message message = messageListing.Data.Children.First().Data;
+
+                // reddit places backslashes before some characters in URLs
+                // so we have to remove those before working with them
+                message.Body = message.Body.Replace("\\", "");
+
                 return message;
             }
             else
