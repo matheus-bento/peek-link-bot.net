@@ -8,11 +8,6 @@ namespace PeekLinkBot.Reddit
 {
     public static class CommentHandler
     {
-        private static readonly Regex UrlRegex =
-            new Regex(
-                @"(?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
-            );
-
         private static readonly Regex YoutubeUrlRegex =
             new Regex(
                 @"(?:http|https)://(?:(?:(?:www\.)?youtube.com)|youtu.be)(?:[/\w]*(?:\?(?:[\w\-_]+=[\w\-_]+)*)?)");
@@ -25,20 +20,14 @@ namespace PeekLinkBot.Reddit
         {
             var linksInfo = new List<string>();
 
-            foreach (Match match in CommentHandler.UrlRegex.Matches(comment))
+            foreach (Match ytMatch in CommentHandler.YoutubeUrlRegex.Matches(comment))
             {
-                string matchedUrl = match.Value;
+                string ytMatchedUrl = ytMatch.Value;
 
-                IScrapper scrapper = null;
+                HtmlDocument dom = await new HtmlWeb().LoadFromWebAsync(ytMatchedUrl);
+                IScrapper scrapper = new YoutubeScrapper(dom);
 
-                if (CommentHandler.YoutubeUrlRegex.IsMatch(matchedUrl))
-                {
-                    HtmlDocument dom = await new HtmlWeb().LoadFromWebAsync(matchedUrl);
-                    scrapper = new YoutubeScrapper(dom);
-                }
-
-                if (scrapper != null)
-                    linksInfo.Add(scrapper.GetPageInfo());
+                linksInfo.Add(scrapper.GetPageInfo());
             }
 
             return linksInfo;
