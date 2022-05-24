@@ -61,7 +61,7 @@ namespace PeekLinkBot
                                 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
                         )
                         .WriteTo.File(
-                            ".log",
+                            "log/.log",
                             rollingInterval: RollingInterval.Day,
                             rollOnFileSizeLimit: true,
                             outputTemplate:
