@@ -13,6 +13,7 @@ After you register the application, add the following informations into your env
     export PeekLinkBot__Password="The bot's reddit account password"
     export PeekLinkBot__ClientID="The client ID for your reddit application"
     export PeekLinkBot__Secret="The secret of your reddit application"
+    export PeekLinkBot__MessageCheckInterval="The interval in seconds you want between inbox checks"
 ```
 
 And then run the service with the following command:
