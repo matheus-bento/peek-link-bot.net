@@ -1,8 +1,8 @@
 using System;
 using HtmlAgilityPack;
-using PeekLinkBot.Reddit.Scrapper.Exceptions;
+using PeekLinkBot.Scrapper.Exceptions;
 
-namespace PeekLinkBot.Reddit.Scrapper
+namespace PeekLinkBot.Scrapper
 {
     /// <summary>
     ///     Class capable of scrapping information about a given youtube video

@@ -1,4 +1,4 @@
-namespace PeekLinkBot.Reddit.Scrapper
+namespace PeekLinkBot.Scrapper
 {
     /// <summary>
     ///     Interface that represents a class capable of scrapping a certain document and extract a string containing

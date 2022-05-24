@@ -13,7 +13,7 @@ using PeekLinkBot.Reddit;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using PeekLinkBot.Reddit.Scrapper.Exceptions;
+using PeekLinkBot.Scrapper.Exceptions;
 
 namespace PeekLinkBot
 {

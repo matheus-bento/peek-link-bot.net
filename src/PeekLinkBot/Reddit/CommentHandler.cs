@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using PeekLinkBot.Reddit.Scrapper;
+using PeekLinkBot.Scrapper;
 
 namespace PeekLinkBot.Reddit
 {
