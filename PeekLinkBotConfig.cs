@@ -20,5 +20,9 @@
         ///     Used in the authentication on the endpoint to retrieve the access token for reddit's API.
         /// </summary>
         public string Secret { get; set; }
+        /// <summary>
+        ///     The interval in seconds that between each inbox check
+        /// </summary>
+        public int MessageCheckInterval { get; set; }
     }
 }

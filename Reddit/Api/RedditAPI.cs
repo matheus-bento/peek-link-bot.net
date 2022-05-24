@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System;
 
 namespace PeekLinkBot.Reddit.Api
@@ -105,56 +104,32 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
         }
 
-        public async IAsyncEnumerable<Message> GetUnreadMentions()
+        public async Task<IEnumerable<Message>> GetUnreadMentions()
         {
-            int attempts = 0;
-            int requestInterval = 1;
+            HttpResponseMessage response = await this._redditHttpClient.GetAsync("/message/unread");
 
-            while (true)
-            {
-                HttpResponseMessage response = await this._redditHttpClient.GetAsync("/message/unread");
+            this._logger.LogDebug("Request: {0}", response.RequestMessage);
 
-                this._logger.LogDebug("Request: {0}", response.RequestMessage);
+            this._logger.LogDebug("Response: {0}", response);
+            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
 
-                this._logger.LogDebug("Response: {0}", response);
-                this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
+            response.EnsureSuccessStatusCode();
 
-                response.EnsureSuccessStatusCode();
-
-                var unreadMessagesListing =
-                    JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
-                        await response.Content.ReadAsStringAsync(),
-                        new JsonSerializerSettings
+            var unreadMessagesListing =
+                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
+                    await response.Content.ReadAsStringAsync(),
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = new DefaultContractResolver
                         {
-                            ContractResolver = new DefaultContractResolver
-                            {
-                                NamingStrategy = new SnakeCaseNamingStrategy()
-                            }
-                        });
+                            NamingStrategy = new SnakeCaseNamingStrategy()
+                        }
+                    });
 
-                var unreadMentions =
-                    unreadMessagesListing.Data.Children.Where(json => json.Data.Type == "username_mention");
+            var unreadMentionsJsonWrapper =
+                unreadMessagesListing.Data.Children.Where(json => json.Data.Type == "username_mention");
 
-                if (unreadMentions.Count() > 0)
-                {
-                    foreach (RedditJson<Message> messageWrapper in unreadMentions)
-                    {
-                        Message message = messageWrapper.Data;
-                        yield return message;
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(requestInterval * 1000);
-
-                    if (requestInterval < 59)
-                    {
-                        requestInterval += (int)Math.Pow(2, attempts);
-                    }
-
-                    attempts++;
-                }
-            }
+            return unreadMentionsJsonWrapper.Select(json => json.Data);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace PeekLinkBot
     {
         static async Task Main(string[] args)
         {
-            await CreateHostBuilder(args).RunConsoleAsync();   
+            await CreateHostBuilder(args).RunConsoleAsync();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args)

@@ -17,22 +17,21 @@ using PeekLinkBot.Reddit.Scrapper.Exceptions;
 
 namespace PeekLinkBot
 {
-    public class PeekLinkBotService : IHostedService
+    public class PeekLinkBotService : IHostedService, IDisposable
     {
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<PeekLinkBotService> _logger;
         private readonly IOptions<PeekLinkBotConfig> _config;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        private Timer _messageCheckTimer;
+
         private RedditAuth _auth;
 
         public PeekLinkBotService(
-            IHostApplicationLifetime hostApplicationLifetime,
             IHttpClientFactory httpClientFactory,
             IOptions<PeekLinkBotConfig> config,
             ILogger<PeekLinkBotService> logger)
         {
-            this._hostApplicationLifetime = hostApplicationLifetime;
             this._httpClientFactory = httpClientFactory;
             this._config = config;
             this._logger = logger;
@@ -55,7 +54,12 @@ namespace PeekLinkBot
             this._logger.LogDebug("Informed password: {0}", this._config.Value.Password);
             this._logger.LogDebug("Service started");
 
-            this._hostApplicationLifetime.ApplicationStarted.Register(async () => await this.OnServiceStarted());
+            this._messageCheckTimer =
+                new Timer(
+                    async (state) => await this.OnMessageCheckTimer(),
+                    null,
+                    TimeSpan.Zero,
+                    TimeSpan.FromSeconds(this._config.Value.MessageCheckInterval));
 
             return Task.CompletedTask;
         }
@@ -63,18 +67,22 @@ namespace PeekLinkBot
         public Task StopAsync(CancellationToken cancellationToken)
         {
             this._logger.LogDebug("Service stopped");
-
             return Task.CompletedTask;
         }
 
-        private async Task OnServiceStarted()
+        public void Dispose()
+        {
+            this._messageCheckTimer.Dispose();
+        }
+
+        private async Task OnMessageCheckTimer()
         {
             try
             {
                 string accessToken = this._auth.GetAccessToken().Result.AccessToken;
                 var redditApi = new RedditAPI(this._httpClientFactory, this._logger, accessToken);
 
-                await foreach (Message message in redditApi.GetUnreadMentions())
+                foreach (Message message in await redditApi.GetUnreadMentions())
                 {
                     // Getting the comment/post targeted by the username mention that calls the bot
                     var targetMessage = await redditApi.GetMessageById(message.ParentId);
