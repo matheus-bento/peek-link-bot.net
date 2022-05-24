@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System;
 using System.Net.Http.Headers;
+using Serilog;
 
 namespace PeekLinkBot
 {
@@ -52,10 +52,21 @@ namespace PeekLinkBot
                     services.Configure<PeekLinkBotConfig>(context.Configuration.GetSection("PeekLinkBot"));
                     services.AddSingleton<IHostedService, PeekLinkBotService>();
                 })
-                .ConfigureLogging((context, logging) =>
+                .UseSerilog((hostingContext, services, config) => 
                 {
-                    logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Debug);
+                    config
+                        .MinimumLevel.Debug()
+                        .WriteTo.Console(
+                            outputTemplate:
+                                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+                        )
+                        .WriteTo.File(
+                            ".log",
+                            rollingInterval: RollingInterval.Day,
+                            rollOnFileSizeLimit: true,
+                            outputTemplate:
+                                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+                        );
                 });
         }
     }
