@@ -1,6 +1,6 @@
 using System;
 
-namespace PeekLinkBot.Scrapper.Exceptions
+namespace PeekLinkBot.Scraper.Exceptions
 {
     public class DocumentScrapingException : Exception
     {

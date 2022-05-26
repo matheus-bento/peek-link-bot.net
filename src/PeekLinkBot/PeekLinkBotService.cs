@@ -13,7 +13,7 @@ using PeekLinkBot.Reddit;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using PeekLinkBot.Scrapper.Exceptions;
+using PeekLinkBot.Scraper.Exceptions;
 
 namespace PeekLinkBot
 {
@@ -89,7 +89,9 @@ namespace PeekLinkBot
 
                     if (targetMessage != null)
                     {
-                        IEnumerable<string> linksInfo = await CommentHandler.GetLinksInfo(targetMessage.Body);
+                        var commentHandler = new CommentHandler(targetMessage.Body);
+
+                        IEnumerable<string> linksInfo = await commentHandler.GetUrlInfo();
 
                         if (linksInfo.Count() > 0)
                         {
