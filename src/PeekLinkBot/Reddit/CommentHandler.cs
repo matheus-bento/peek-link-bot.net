@@ -31,7 +31,7 @@ namespace PeekLinkBot.Reddit
             var urlInfo = new List<string>();
 
             IEnumerable<string> urls = (from m in this.URL_REGEX.Matches(this._comment)
-                                        select m.Value).Distinct();
+                                        select m.Value.Replace("\\", "")).Distinct();
 
             foreach (string url in urls)
             {
