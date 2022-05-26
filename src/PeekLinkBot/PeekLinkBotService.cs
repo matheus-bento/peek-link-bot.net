@@ -89,7 +89,7 @@ namespace PeekLinkBot
 
                     if (targetMessage != null)
                     {
-                        var commentHandler = new CommentHandler(targetMessage.Body);
+                        var commentHandler = new CommentHandler(this._logger, targetMessage.Body);
 
                         IEnumerable<string> linksInfo = await commentHandler.GetUrlInfo();
 

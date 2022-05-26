@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using PeekLinkBot.Scraper;
 using PeekLinkBot.Scraper.Model;
 
@@ -16,10 +17,13 @@ namespace PeekLinkBot.Reddit
         /// </summary>
         private readonly Regex URL_REGEX = new Regex(
             @"(?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)");
+
+        private ILogger<PeekLinkBotService> _logger;
         private readonly string _comment;
 
-        public CommentHandler(string comment)
+        public CommentHandler(ILogger<PeekLinkBotService> logger, string comment)
         {
+            this._logger = logger;
             this._comment = comment;
         }
 
@@ -44,10 +48,13 @@ namespace PeekLinkBot.Reddit
 
                 string infoString = this.GetUrlInfoString(info);
 
+                this._logger.LogDebug("Info string for '{0}': {1}", url, infoString);
+
                 if (!String.IsNullOrEmpty(infoString))
                 {
                     urlInfo.Add(infoString);
                 }
+
             }
 
             return urlInfo;
@@ -89,7 +96,10 @@ namespace PeekLinkBot.Reddit
                 infoString += String.Format("{0}\n\n", description);
             }
 
-            infoString += "---\n";
+            // If the info string didn't catch any metadata don't add the separator so
+            // that the service can identify that no metadata was found for this website
+            if (!String.IsNullOrEmpty(infoString))
+                infoString += "---\n";
 
             return infoString;
         }
