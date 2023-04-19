@@ -6,11 +6,11 @@ using PeekLinkBot.Scraper.Model;
 namespace PeekLinkBot.Tests
 {
 	[TestClass]
-    public class OpenGraphScrapperUnitTests
+    public class OpenGraphScraperUnitTests
     {
         private PageInfo _pageInfo;
 
-        public OpenGraphScrapperUnitTests()
+        public OpenGraphScraperUnitTests()
         {
             var urlHandler = new UrlHandler();
 
@@ -959,31 +959,31 @@ namespace PeekLinkBot.Tests
         }
 
         [TestMethod]
-        public void ShouldExtractCorrtectOgTitle()
+        public void ShouldExtractCorrectOgTitle()
         {
             Assert.AreEqual("Rick Astley - Never Gonna Give You Up (Official Music Video)", this._pageInfo.Title);
         }
 
         [TestMethod]
-        public void ShouldExtractCorrtectOgType()
+        public void ShouldExtractCorrectOgType()
         {
             Assert.AreEqual("video.other", this._pageInfo.Type);
         }
 
         [TestMethod]
-        public void ShouldExtractCorrtectOgImage()
+        public void ShouldExtractCorrectOgImage()
         {
             Assert.AreEqual("https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg", this._pageInfo.Image);
         }
 
         [TestMethod]
-        public void ShouldExtractCorrtectOgUrl()
+        public void ShouldExtractCorrectOgUrl()
         {
             Assert.AreEqual("https://www.youtube.com/watch?v=dQw4w9WgXcQ", this._pageInfo.Url);
         }
 
         [TestMethod]
-        public void ShouldExtractCorrtectOgDescription()
+        public void ShouldExtractCorrectOgDescription()
         {
             Assert.AreEqual(
                 "The official video for “Never Gonna Give You Up” by Rick Astley‘Hold Me In Your Arms’ – deluxe blue " + "vinyl,  2CD and digital deluxe out 12th May 2023 Pre-orde...", this._pageInfo.Description);
