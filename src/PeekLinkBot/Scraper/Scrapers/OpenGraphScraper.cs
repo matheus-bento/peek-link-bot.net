@@ -66,7 +66,8 @@ namespace PeekLinkBot.Scraper
 
                 if (String.IsNullOrEmpty(info.Description))
                 {
-                    HtmlNode ogDescription = this._dom.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
+                    HtmlNode ogDescription =
+                        this._dom.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
 
                     if (ogDescription != null)
                         info.Description = ogDescription.Attributes["content"].Value;

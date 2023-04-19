@@ -12,7 +12,11 @@ namespace PeekLinkBot.Reddit.Api.Converters
     {
         private readonly DateTime _unixEpoch = new DateTime(1970, 1, 1);
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer)
         {
             
             if (reader.Value != null)
