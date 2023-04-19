@@ -1,12 +1,11 @@
-using HtmlAgilityPack;
 using PeekLinkBot.Scraper.Model;
 
 namespace PeekLinkBot.Scraper
 {
-    /// <summary>
-    ///     Interface that defines a method capable of scraping a certain document and extract some metadata from it
-    /// </summary>
-    public interface IScraper
+	/// <summary>
+	///     Interface that defines a method capable of scraping a certain document and extract some metadata from it
+	/// </summary>
+	public interface IScraper
     {
         /// <summary>
         ///     Scrapes a web page and returns a PageInfo with metadata describing it
