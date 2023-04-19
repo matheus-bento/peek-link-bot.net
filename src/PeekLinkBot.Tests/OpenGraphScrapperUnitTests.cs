@@ -986,7 +986,8 @@ namespace PeekLinkBot.Tests
         public void ShouldExtractCorrectOgDescription()
         {
             Assert.AreEqual(
-                "The official video for “Never Gonna Give You Up” by Rick Astley‘Hold Me In Your Arms’ – deluxe blue " + "vinyl,  2CD and digital deluxe out 12th May 2023 Pre-orde...", this._pageInfo.Description);
+                "The official video for “Never Gonna Give You Up” by Rick Astley‘Hold Me In Your Arms’ – deluxe blue " +
+                "vinyl,  2CD and digital deluxe out 12th May 2023 Pre-orde...", this._pageInfo.Description);
         }
     }
 }
