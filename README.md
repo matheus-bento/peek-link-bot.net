@@ -36,7 +36,7 @@ ENV PeekLinkBot__MessageCheckInterval=15
 Then build the image
 
 ```bash
-docker build -t peek-link-bot:dev ./src/PeekLinkBot
+docker build -t peek-link-bot:dev -f ./src/PeekLinkBot/Dockerfile .
 ```
 
 and run the container
