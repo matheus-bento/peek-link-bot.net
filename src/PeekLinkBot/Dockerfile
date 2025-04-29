@@ -13,11 +13,12 @@ RUN dotnet publish "./PeekLinkBot.csproj" -c $BUILD_CONFIG -o /app/publish /p:Us
 
 FROM mcr.microsoft.com/dotnet/runtime:9.0
 
-ENV PeekLinkBot__ClientID="PeekLinkBot__ClientID"
-ENV PeekLinkBot__Secret="PeekLinkBot__Secret"
-ENV PeekLinkBot__Username="PeekLinkBot__Username"
-ENV PeekLinkBot__Password="PeekLinkBot__Password"
-ENV PeekLinkBot__MessageCheckInterval=15
+ENV PEEK_LINK_BOT_CLIENT_ID="PEEK_LINK_BOT_CLIENT_ID"
+ENV PEEK_LINK_BOT_SECRET="PEEK_LINK_BOT_SECRET"
+ENV PEEK_LINK_BOT_USERNAME="PEEK_LINK_BOT_USERNAME"
+ENV PEEK_LINK_BOT_PASSWORD="PEEK_LINK_BOT_PASSWORD"
+ENV PEEK_LINK_BOT_MESSAGE_CHECK_INTERVAL=15
+ENV PEEK_LINK_BOT_MONGO_DB_CONNECTION_STRING="PEEK_LINK_BOT_MONGO_DB_CONNECTION_STRING"
 
 WORKDIR /app
 COPY --from=publish /app/publish .

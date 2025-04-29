@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using PeekLinkBot.Scraper.Exceptions;
+using PeekLinkBot.Configuration;
 
 namespace PeekLinkBot
 {

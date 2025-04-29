@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using System;
 using System.Net.Http.Headers;
 using Serilog;
+using MongoDB.Driver;
+using PeekLinkBot.Configuration;
 
 namespace PeekLinkBot
 {
@@ -20,7 +23,7 @@ namespace PeekLinkBot
             return new HostBuilder()
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    config.AddEnvironmentVariables();
+                    config.AddEnvironmentVariables("PEEK_LINK_BOT_");
 
                     if (args != null)
                     {
@@ -49,8 +52,11 @@ namespace PeekLinkBot
                             .Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
                     });
 
-                    services.Configure<PeekLinkBotConfig>(context.Configuration.GetSection("PeekLinkBot"));
+                    services.Configure<PeekLinkBotConfig>(context.Configuration);
+
                     services.AddSingleton<IHostedService, PeekLinkBotService>();
+
+                    services.ConfigureApplicationDatabase();
                 })
                 .UseSerilog((hostingContext, services, config) => 
                 {
