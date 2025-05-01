@@ -1,0 +1,46 @@
+services:
+  peek-link-bot:
+    image: peek-link-bot
+    build:
+      context: .
+      dockerfile: src/PeekLinkBot/Dockerfile
+    environment:
+      - PEEK_LINK_BOT_CLIENT_ID=$PEEK_LINK_BOT_CLIENT_ID
+      - PEEK_LINK_BOT_SECRET=$PEEK_LINK_BOT_SECRET
+      - PEEK_LINK_BOT_USERNAME=$PEEK_LINK_BOT_USERNAME
+      - PEEK_LINK_BOT_PASSWORD=$PEEK_LINK_BOT_PASSWORD
+      - PEEK_LINK_BOT_MESSAGE_CHECK_INTERVAL=$PEEK_LINK_BOT_MESSAGE_CHECK_INTERVAL
+      - PEEK_LINK_BOT_MONGO_DB_CONNECTION_STRING=mongodb://$MONGODB_ROOT_USERNAME:$MONGODB_ROOT_PASSWORD@mongo:27017/
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - peek-link-bot-network
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_ROOT_PASSWORD
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+        test: [
+            "CMD",
+            "echo",
+            "'db.runCommand(\"ping\").ok'",
+            "|",
+            "mongosh",
+            "mongodb://$MONGODB_ROOT_USERNAME:$MONGODB_ROOT_PASSWORD@localhost/ --quiet"
+        ]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+    networks:
+      - peek-link-bot-network
+volumes:
+  mongo-data:
+networks:
+  peek-link-bot-network:
+    driver: bridge

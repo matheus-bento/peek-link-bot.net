@@ -1,13 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using System;
-using System.Net.Http.Headers;
-using Serilog;
-using MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
 using PeekLinkBot.Configuration;
+using Serilog;
 
 namespace PeekLinkBot
 {
