@@ -10,11 +10,12 @@ First, you have to create a reddit account and add the peek-link-bot application
 After you register the application, add the following informations into your environment variables:
 
 ``` bash
-export PeekLinkBot__ClientID="The client ID for your reddit application"
-export PeekLinkBot__Secret="The secret of your reddit application"
-export PeekLinkBot__Username="The bot's reddit account username"
-export PeekLinkBot__Password="The bot's reddit account password"
-export PeekLinkBot__MessageCheckInterval=15
+export PEEK_LINK_BOT_CLIENT_ID="The client ID for your reddit application"
+export PEEK_LINK_BOT_SECRET="The secret of your reddit application"
+export PEEK_LINK_BOT_USERNAME="The bot's reddit account username"
+export PEEK_LINK_BOT_PASSWORD="The bot's reddit account password"
+export PEEK_LINK_BOT_MESSAGE_CHECK_INTERVAL=15 # Seconds
+export PEEK_LINK_BOT_MONGO_DB_CONNECTION_STRING="Mongo database that will store the bot's interactions"
 ```
 
 And then run the service with the following command:
@@ -23,24 +24,10 @@ And then run the service with the following command:
 dotnet run
 ```
 
-Or alternatively, you can use docker to run the script into a container. Make sure to edit the Dockerfile and register the environment variables required by the application.
-
-```Dockerfile
-ENV PeekLinkBot__ClientID="The client ID for your reddit application"
-ENV PeekLinkBot__Secret="The secret of your reddit application"
-ENV PeekLinkBot__Username="The bot's reddit account username"
-ENV PeekLinkBot__Password="The bot's reddit account password"
-ENV PeekLinkBot__MessageCheckInterval=15
-```
-
-Then build the image
+Or alternatively, you can use docker-compose to create an environment ready to run the application.
 
 ```bash
-docker build -t peek-link-bot:dev -f ./src/PeekLinkBot/Dockerfile .
+docker-compose -p peek-link-bot up -d
 ```
 
-and run the container
-
-```bash
-docker run -d --name peek-link-bot peek-link-bot:dev
-```
+Make sure to register the required environment variables before starting the docker compose project.
