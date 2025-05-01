@@ -65,8 +65,8 @@ namespace PeekLinkBot.Reddit.Api
             this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
 
             var messageListing =
-                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
-                        await response.Content.ReadAsStringAsync());
+                JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
+                    await response.Content.ReadAsStringAsync());
 
             if (messageListing.Data.Children.Count() == 0)
             {
@@ -103,15 +103,15 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
 
             var messageListing =
-                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
-                        await response.Content.ReadAsStringAsync());
+                JsonConvert.DeserializeObject<RedditJson<Message>>(
+                    await response.Content.ReadAsStringAsync());
 
-            if (messageListing.Data.Children.Count() == 0)
+            if (messageListing.Json.Data.Things.Count() == 0)
             {
                 throw new RedditApiException("Did not receive data from reddit about the posted comment");
             }
 
-            Message message = messageListing.Data.Children.First().Data;
+            Message message = messageListing.Json.Data.Things.First().Data;
 
             // reddit places backslashes before some characters in URLs
             // so we have to remove those before working with them
@@ -132,7 +132,7 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
 
             var unreadMessagesListing =
-                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
+                JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
                     await response.Content.ReadAsStringAsync(),
                     new JsonSerializerSettings
                     {
