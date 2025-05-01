@@ -40,21 +40,21 @@ namespace PeekLinkBot.Domain.UseCases
                 {
                     RedditId = interaction.OriginalComment.RedditId,
                     Username = interaction.OriginalComment.Username,
-                    CreatedAt = interaction.OriginalComment.CreatedAt,
+                    CreatedAtUtc = interaction.OriginalComment.CreatedAtUtc,
                     Content = interaction.OriginalComment.Content
                 },
                 TriggerComment = new Comment
                 {
                     RedditId = interaction.TriggerComment.RedditId,
                     Username = interaction.TriggerComment.Username,
-                    CreatedAt = interaction.TriggerComment.CreatedAt,
+                    CreatedAtUtc = interaction.TriggerComment.CreatedAtUtc,
                     Content = interaction.TriggerComment.Content
                 },
                 ReplyComment = new Comment
                 {
                     RedditId = interaction.ReplyComment.RedditId,
                     Username = interaction.ReplyComment.Username,
-                    CreatedAt = interaction.ReplyComment.CreatedAt,
+                    CreatedAtUtc = interaction.ReplyComment.CreatedAtUtc,
                     Content = interaction.ReplyComment.Content
                 }
             });

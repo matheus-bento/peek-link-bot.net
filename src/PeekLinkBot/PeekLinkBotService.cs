@@ -102,23 +102,23 @@ namespace PeekLinkBot
                                 {
                                     OriginalComment = new CommentDto
                                     {
-                                        RedditId = targetMessage.Name,
+                                        RedditId = targetMessage.Id,
                                         Username = targetMessage.Author,
-                                        CreatedAt = targetMessage.CreatedUtc,
+                                        CreatedAtUtc = targetMessage.CreatedUtc,
                                         Content = targetMessage.Body
                                     },
                                     TriggerComment = new CommentDto
                                     {
-                                        RedditId = message.Name,
+                                        RedditId = message.Id,
                                         Username = message.Author,
-                                        CreatedAt = message.CreatedUtc,
+                                        CreatedAtUtc = message.CreatedUtc,
                                         Content = message.Body
                                     },
                                     ReplyComment = new CommentDto
                                     {
-                                        RedditId = replyMessage.Name,
+                                        RedditId = replyMessage.Id,
                                         Username = replyMessage.Author,
-                                        CreatedAt = replyMessage.CreatedUtc,
+                                        CreatedAtUtc = replyMessage.CreatedUtc,
                                         Content = replyMessage.Body
                                     }
                                 });

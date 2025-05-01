@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using PeekLinkBot.Reddit.Exceptions;
+using PeekLinkBot.Configuration;
 
 namespace PeekLinkBot.Reddit.Api
 {
@@ -66,7 +67,7 @@ namespace PeekLinkBot.Reddit.Api
 
             var messageListing =
                 JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
-                    await response.Content.ReadAsStringAsync());
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
             if (messageListing.Data.Children.Count() == 0)
             {
@@ -104,7 +105,7 @@ namespace PeekLinkBot.Reddit.Api
 
             var messageListing =
                 JsonConvert.DeserializeObject<RedditJson<Message>>(
-                    await response.Content.ReadAsStringAsync());
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
             if (messageListing.Json.Data.Things.Count() == 0)
             {
@@ -133,14 +134,7 @@ namespace PeekLinkBot.Reddit.Api
 
             var unreadMessagesListing =
                 JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy()
-                        }
-                    });
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
             var unreadMentionsJsonWrapper =
                 unreadMessagesListing.Data.Children.Where(json => json.Data.Type == "username_mention");
