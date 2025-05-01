@@ -22,21 +22,21 @@ namespace PeekLinkBot.Domain.UseCases
                     {
                         RedditId = interaction.OriginalComment.RedditId,
                         Username = interaction.OriginalComment.Username,
-                        CreatedAt = interaction.OriginalComment.CreatedAt.ToString(),
+                        CreatedAt = interaction.OriginalComment.CreatedAt,
                         Content = interaction.OriginalComment.Content
                     },
                     TriggerComment = new CommentDto
                     {
                         RedditId = interaction.TriggerComment.RedditId,
                         Username = interaction.TriggerComment.Username,
-                        CreatedAt = interaction.TriggerComment.CreatedAt.ToString(),
+                        CreatedAt = interaction.TriggerComment.CreatedAt,
                         Content = interaction.TriggerComment.Content
                     },
                     ReplyComment = new CommentDto
                     {
                         RedditId = interaction.ReplyComment.RedditId,
                         Username = interaction.ReplyComment.Username,
-                        CreatedAt = interaction.ReplyComment.CreatedAt.ToString(),
+                        CreatedAt = interaction.ReplyComment.CreatedAt,
                         Content = interaction.ReplyComment.Content
                     }
                 });

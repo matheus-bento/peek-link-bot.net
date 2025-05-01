@@ -28,7 +28,7 @@ namespace PeekLinkBot.Reddit.Api.Model
         public string Author { get; set; }
         public string Body { get; set; }
         [JsonConverter(typeof(RedditUnixTimestampConverter))]
-        public DateTime? CreatedUtc { get; set; }
+        public DateTime CreatedUtc { get; set; }
         public string Dest { get; set; }
     }
 }

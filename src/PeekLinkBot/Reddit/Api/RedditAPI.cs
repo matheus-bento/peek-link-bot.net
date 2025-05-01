@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using PeekLinkBot.Reddit.Exceptions;
 
 namespace PeekLinkBot.Reddit.Api
 {
@@ -67,23 +68,21 @@ namespace PeekLinkBot.Reddit.Api
                 JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
                         await response.Content.ReadAsStringAsync());
 
-            if (messageListing.Data.Children.Count() > 0)
+            if (messageListing.Data.Children.Count() == 0)
             {
-                Message message = messageListing.Data.Children.First().Data;
-
-                // reddit places backslashes before some characters in URLs
-                // so we have to remove those before working with them
-                message.Body = message.Body.Replace("\\", "");
-
-                return message;
+                throw new RedditApiException("Message not found");
             }
-            else
-            {
-                return null;
-            }
+
+            Message message = messageListing.Data.Children.First().Data;
+
+            // reddit places backslashes before some characters in URLs
+            // so we have to remove those before working with them
+            message.Body = message.Body.Replace("\\", "");
+
+            return message;
         }
 
-        public async Task PostComment(string repliedMessageFullname, string text)
+        public async Task<Message> PostComment(string repliedMessageFullname, string text)
         {
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
@@ -102,6 +101,23 @@ namespace PeekLinkBot.Reddit.Api
             this._logger.LogDebug("Response: {0}", response);
 
             response.EnsureSuccessStatusCode();
+
+            var messageListing =
+                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
+                        await response.Content.ReadAsStringAsync());
+
+            if (messageListing.Data.Children.Count() == 0)
+            {
+                throw new RedditApiException("Did not receive data from reddit about the posted comment");
+            }
+
+            Message message = messageListing.Data.Children.First().Data;
+
+            // reddit places backslashes before some characters in URLs
+            // so we have to remove those before working with them
+            message.Body = message.Body.Replace("\\", "");
+
+            return message;
         }
 
         public async Task<IEnumerable<Message>> GetUnreadMentions()
