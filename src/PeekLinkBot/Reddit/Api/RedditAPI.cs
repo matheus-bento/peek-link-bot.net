@@ -10,6 +10,8 @@ using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using PeekLinkBot.Reddit.Exceptions;
+using PeekLinkBot.Configuration;
 
 namespace PeekLinkBot.Reddit.Api
 {
@@ -26,6 +28,8 @@ namespace PeekLinkBot.Reddit.Api
             ILogger<PeekLinkBotService> logger,
             string accessToken)
         {
+            ArgumentException.ThrowIfNullOrEmpty(accessToken);
+
             this._logger = logger;
 
             this._redditHttpClient = httpClientFactory.CreateClient("Reddit");
@@ -35,6 +39,8 @@ namespace PeekLinkBot.Reddit.Api
 
         public async Task MarkMessageAsRead(Message message)
         {
+            ArgumentNullException.ThrowIfNull(message);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
                     "/api/read_message",
@@ -46,7 +52,13 @@ namespace PeekLinkBot.Reddit.Api
                     ));
 
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
-            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+
+            if (response.RequestMessage?.Content != null)
+                this._logger.LogDebug(
+                    "Request Content: {0}",
+                    await response.RequestMessage.Content.ReadAsStringAsync()
+                );
+
             this._logger.LogDebug("Response: {0}", response);
 
             response.EnsureSuccessStatusCode();
@@ -54,6 +66,8 @@ namespace PeekLinkBot.Reddit.Api
 
         public async Task<Message> GetMessageById(string messageId)
         {
+            ArgumentException.ThrowIfNullOrEmpty(messageId);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.GetAsync(
                     String.Format("/api/info?id={0}", messageId));
@@ -61,30 +75,36 @@ namespace PeekLinkBot.Reddit.Api
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
 
             this._logger.LogDebug("Response: {0}", response);
-            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
+            this._logger.LogDebug(
+                "Response Content: {0}",
+                await response.Content.ReadAsStringAsync()
+            );
+
+            response.EnsureSuccessStatusCode();
 
             var messageListing =
-                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
-                        await response.Content.ReadAsStringAsync());
+                JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
-            if (messageListing.Data.Children.Count() > 0)
+            if (messageListing.Data.Children.Count() == 0)
             {
-                Message message = messageListing.Data.Children.First().Data;
-
-                // reddit places backslashes before some characters in URLs
-                // so we have to remove those before working with them
-                message.Body = message.Body.Replace("\\", "");
-
-                return message;
+                throw new RedditApiException("Message not found");
             }
-            else
-            {
-                return null;
-            }
+
+            Message message = messageListing.Data.Children.First().Data;
+
+            // reddit places backslashes before some characters in URLs
+            // so we have to remove those before working with them
+            message.Body = message.Body.Replace("\\", "");
+
+            return message;
         }
 
-        public async Task PostComment(string repliedMessageFullname, string text)
+        public async Task<Message> PostComment(string repliedMessageFullname, string text)
         {
+            ArgumentException.ThrowIfNullOrEmpty(repliedMessageFullname);
+            ArgumentException.ThrowIfNullOrEmpty(text);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
                     "/api/comment",
@@ -98,10 +118,33 @@ namespace PeekLinkBot.Reddit.Api
                     ));
 
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
-            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+
+            if (response.RequestMessage?.Content != null)
+                this._logger.LogDebug(
+                    "Request Content: {0}",
+                    await response.RequestMessage.Content.ReadAsStringAsync()
+                );
+
             this._logger.LogDebug("Response: {0}", response);
 
             response.EnsureSuccessStatusCode();
+
+            var messageListing =
+                JsonConvert.DeserializeObject<RedditJson<Message>>(
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
+
+            if (messageListing.Json.Data.Things.Count() == 0)
+            {
+                throw new RedditApiException("Did not receive data from reddit about the posted comment");
+            }
+
+            Message message = messageListing.Json.Data.Things.First().Data;
+
+            // reddit places backslashes before some characters in URLs
+            // so we have to remove those before working with them
+            message.Body = message.Body.Replace("\\", "");
+
+            return message;
         }
 
         public async Task<IEnumerable<Message>> GetUnreadMentions()
@@ -116,15 +159,8 @@ namespace PeekLinkBot.Reddit.Api
             response.EnsureSuccessStatusCode();
 
             var unreadMessagesListing =
-                JsonConvert.DeserializeObject<RedditJson<Listing<RedditJson<Message>>>>(
-                    await response.Content.ReadAsStringAsync(),
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = new DefaultContractResolver
-                        {
-                            NamingStrategy = new SnakeCaseNamingStrategy()
-                        }
-                    });
+                JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
+                    await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
             var unreadMentionsJsonWrapper =
                 unreadMessagesListing.Data.Children.Where(json => json.Data.Type == "username_mention");

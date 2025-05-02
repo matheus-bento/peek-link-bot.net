@@ -14,6 +14,11 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using PeekLinkBot.Scraper.Exceptions;
+using PeekLinkBot.Configuration;
+using PeekLinkBot.Data.Repositories;
+using PeekLinkBot.Domain.UseCases;
+using PeekLinkBot.Domain.Dto;
+using PeekLinkBot.Reddit.Exceptions;
 
 namespace PeekLinkBot
 {
@@ -22,15 +27,18 @@ namespace PeekLinkBot
         private readonly ILogger<PeekLinkBotService> _logger;
         private readonly IOptions<PeekLinkBotConfig> _config;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IBotInteractionRepository _botInteractionRepository;
 
         private readonly RedditAuth _auth;
 
         public PeekLinkBotService(
             IHttpClientFactory httpClientFactory,
+            IBotInteractionRepository botInteractionRepository,
             IOptions<PeekLinkBotConfig> config,
             ILogger<PeekLinkBotService> logger)
         {
             this._httpClientFactory = httpClientFactory;
+            this._botInteractionRepository = botInteractionRepository;
             this._config = config;
             this._logger = logger;
 
@@ -67,7 +75,7 @@ namespace PeekLinkBot
                     foreach (Message message in await redditApi.GetUnreadMentions())
                     {
                         // Getting the comment/post targeted by the username mention that calls the bot
-                        var targetMessage = await redditApi.GetMessageById(message.ParentId);
+                        Message targetMessage = await redditApi.GetMessageById(message.ParentId);
 
                         if (targetMessage != null)
                         {
@@ -85,7 +93,35 @@ namespace PeekLinkBot
                                     "^[github](https://github.com/matheus-bento/peek-link-bot.net) ^:)",
                                     String.Join('\n', linksInfo));
 
-                                await redditApi.PostComment(message.Name, reply);
+                                Message replyMessage = await redditApi.PostComment(message.Name, reply);
+
+                                var saveInteractionUseCase =
+                                    new SaveInteractionUseCase(this._botInteractionRepository);
+
+                                await saveInteractionUseCase.Execute(new BotInteractionDto
+                                {
+                                    OriginalComment = new CommentDto
+                                    {
+                                        RedditId = targetMessage.Id,
+                                        Username = targetMessage.Author,
+                                        CreatedAtUtc = targetMessage.CreatedUtc,
+                                        Content = targetMessage.Body
+                                    },
+                                    TriggerComment = new CommentDto
+                                    {
+                                        RedditId = message.Id,
+                                        Username = message.Author,
+                                        CreatedAtUtc = message.CreatedUtc,
+                                        Content = message.Body
+                                    },
+                                    ReplyComment = new CommentDto
+                                    {
+                                        RedditId = replyMessage.Id,
+                                        Username = replyMessage.Author,
+                                        CreatedAtUtc = replyMessage.CreatedUtc,
+                                        Content = replyMessage.Body
+                                    }
+                                });
                             }
                         }
 
@@ -99,6 +135,14 @@ namespace PeekLinkBot
                 catch (DocumentScrapingException scrapingException)
                 {
                     this._logger.LogError(scrapingException, "An error occured while scraping a document");
+                }
+                catch (RedditApiException redditException)
+                {
+                    this._logger.LogError(redditException, "An error occured while accessing reddit's API");
+                }
+                catch (Exception ex)
+                {
+                    this._logger.LogError(ex, "An unexpected error occurred");
                 }
                 finally
                 {

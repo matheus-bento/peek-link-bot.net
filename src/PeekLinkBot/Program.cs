@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using System;
-using System.Net.Http.Headers;
+using Microsoft.Extensions.Hosting;
+using PeekLinkBot.Configuration;
 using Serilog;
 
 namespace PeekLinkBot
@@ -20,7 +21,7 @@ namespace PeekLinkBot
             return new HostBuilder()
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    config.AddEnvironmentVariables();
+                    config.AddEnvironmentVariables("PEEK_LINK_BOT_");
 
                     if (args != null)
                     {
@@ -49,8 +50,11 @@ namespace PeekLinkBot
                             .Add(new ProductInfoHeaderValue("PeekLinkBot", "1.0"));
                     });
 
-                    services.Configure<PeekLinkBotConfig>(context.Configuration.GetSection("PeekLinkBot"));
+                    services.Configure<PeekLinkBotConfig>(context.Configuration);
+
                     services.AddSingleton<IHostedService, PeekLinkBotService>();
+
+                    services.ConfigureApplicationDatabase();
                 })
                 .UseSerilog((hostingContext, services, config) => 
                 {

@@ -13,12 +13,6 @@ RUN dotnet publish "./PeekLinkBot.csproj" -c $BUILD_CONFIG -o /app/publish /p:Us
 
 FROM mcr.microsoft.com/dotnet/runtime:9.0
 
-ENV PeekLinkBot__ClientID="PeekLinkBot__ClientID"
-ENV PeekLinkBot__Secret="PeekLinkBot__Secret"
-ENV PeekLinkBot__Username="PeekLinkBot__Username"
-ENV PeekLinkBot__Password="PeekLinkBot__Password"
-ENV PeekLinkBot__MessageCheckInterval=15
-
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "PeekLinkBot.dll"]

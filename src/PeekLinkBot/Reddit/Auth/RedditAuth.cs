@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
+using PeekLinkBot.Configuration;
 
 namespace PeekLinkBot.Reddit.Auth
 {
@@ -34,6 +35,11 @@ namespace PeekLinkBot.Reddit.Auth
             string clientID,
             string secret)
         {
+            ArgumentException.ThrowIfNullOrEmpty(username);
+            ArgumentException.ThrowIfNullOrEmpty(password);
+            ArgumentException.ThrowIfNullOrEmpty(clientID);
+            ArgumentException.ThrowIfNullOrEmpty(secret);
+
             this._httpClientFactory = httpClientFactory;
             this._logger = logger;
 
@@ -87,15 +93,7 @@ namespace PeekLinkBot.Reddit.Auth
 
                 AccessTokenResponseContent content = 
                     JsonConvert.DeserializeObject<AccessTokenResponseContent>(
-                        await response.Content.ReadAsStringAsync(),
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = new DefaultContractResolver
-                            {
-                                NamingStrategy = new SnakeCaseNamingStrategy()
-                            }
-                        }
-                    );
+                        await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
 
                 return content;
             }
