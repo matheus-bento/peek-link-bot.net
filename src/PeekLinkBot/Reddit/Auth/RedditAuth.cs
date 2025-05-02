@@ -35,6 +35,11 @@ namespace PeekLinkBot.Reddit.Auth
             string clientID,
             string secret)
         {
+            ArgumentException.ThrowIfNullOrEmpty(username);
+            ArgumentException.ThrowIfNullOrEmpty(password);
+            ArgumentException.ThrowIfNullOrEmpty(clientID);
+            ArgumentException.ThrowIfNullOrEmpty(secret);
+
             this._httpClientFactory = httpClientFactory;
             this._logger = logger;
 
