@@ -48,7 +48,13 @@ namespace PeekLinkBot.Reddit.Api
                     ));
 
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
-            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+
+            if (response.RequestMessage?.Content != null)
+                this._logger.LogDebug(
+                    "Request Content: {0}",
+                    await response.RequestMessage.Content.ReadAsStringAsync()
+                );
+
             this._logger.LogDebug("Response: {0}", response);
 
             response.EnsureSuccessStatusCode();
@@ -63,7 +69,12 @@ namespace PeekLinkBot.Reddit.Api
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
 
             this._logger.LogDebug("Response: {0}", response);
-            this._logger.LogDebug("Response Content: {0}", await response.Content.ReadAsStringAsync());
+            this._logger.LogDebug(
+                "Response Content: {0}",
+                await response.Content.ReadAsStringAsync()
+            );
+
+            response.EnsureSuccessStatusCode();
 
             var messageListing =
                 JsonConvert.DeserializeObject<RedditThing<Listing<RedditThing<Message>>>>(
@@ -98,7 +109,13 @@ namespace PeekLinkBot.Reddit.Api
                     ));
 
             this._logger.LogDebug("Request: {0}", response.RequestMessage);
-            this._logger.LogDebug("Request Content: {0}", await response.RequestMessage.Content.ReadAsStringAsync());
+
+            if (response.RequestMessage?.Content != null)
+                this._logger.LogDebug(
+                    "Request Content: {0}",
+                    await response.RequestMessage.Content.ReadAsStringAsync()
+                );
+
             this._logger.LogDebug("Response: {0}", response);
 
             response.EnsureSuccessStatusCode();
