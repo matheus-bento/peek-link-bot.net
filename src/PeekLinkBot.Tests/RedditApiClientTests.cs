@@ -31,6 +31,24 @@ public class RedditApiClientTests
     }
 
     [TestMethod]
+    [TestCategory("RedditAPI")]
+    public void RedditApiThrowsIfAccessTokenIsNull()
+    {
+        HttpClient httpClient = new MockHttpClient().GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        Assert.Throws<ArgumentException>(
+            () => new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                null
+            ));
+    }
+
+    [TestMethod]
     [TestCategory("GetMessageById")]
     public async Task GetMessageByIdThrowsArgumentExceptionIfMessageIdIsNull()
     {

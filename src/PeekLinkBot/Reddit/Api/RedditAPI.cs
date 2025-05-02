@@ -28,6 +28,8 @@ namespace PeekLinkBot.Reddit.Api
             ILogger<PeekLinkBotService> logger,
             string accessToken)
         {
+            ArgumentException.ThrowIfNullOrEmpty(accessToken);
+
             this._logger = logger;
 
             this._redditHttpClient = httpClientFactory.CreateClient("Reddit");
