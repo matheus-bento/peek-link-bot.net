@@ -32,10 +32,88 @@ public class RedditApiClientTests
 
     [TestMethod]
     [TestCategory("GetMessageById")]
+    public async Task GetMessageByIdThrowsArgumentExceptionIfMessageIdIsNull()
+    {
+        HttpClient httpClient =
+            new MockHttpClient()
+                .Map(HttpMethod.Get, "/api/info", new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = JsonContent.Create(
+                        new RedditThing<Listing<RedditThing<Message>>>
+                        {
+                            Kind = "Listing",
+                            Data = new Listing<RedditThing<Message>>
+                            {
+                                After = null,
+                                Before = null,
+                                Children = Array.Empty<RedditThing<Message>>()
+                            }
+                        })
+                })
+                .GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        // Since we are mocking the HTTP request, the access token is not used
+        var redditApi =
+            new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                "unused"
+            );
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            async () => await redditApi.GetMessageById(null));
+    }
+
+    [TestMethod]
+    [TestCategory("GetMessageById")]
+    public async Task GetMessageByIdThrowsRedditApiExceptionIfGetMessageByIdIsNotFound()
+    {
+        HttpClient httpClient =
+            new MockHttpClient()
+                .Map(HttpMethod.Get, "/api/info", new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = JsonContent.Create(
+                        new RedditThing<Listing<RedditThing<Message>>>
+                        {
+                            Kind = "Listing",
+                            Data = new Listing<RedditThing<Message>>
+                            {
+                                After = null,
+                                Before = null,
+                                Children = Array.Empty<RedditThing<Message>>()
+                            }
+                        })
+                })
+                .GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        // Since we are mocking the HTTP request, the access token is not used
+        var redditApi =
+            new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                "unused"
+            );
+
+        await Assert.ThrowsAsync<RedditApiException>(
+            async () => await redditApi.GetMessageById("s0m31D"));
+    }
+
+    [TestMethod]
+    [TestCategory("GetMessageById")]
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.Unauthorized)]
     [DataRow(HttpStatusCode.NotFound)]
-    public async Task ThrowsHttpRequestExceptionIfGetMessageByIdIsUnsuccessful(
+    public async Task GetMessageByIdThrowsHttpRequestExceptionIfGetMessageByIdIsUnsuccessful(
         HttpStatusCode statusCode)
     {
         HttpClient httpClient =
@@ -66,7 +144,7 @@ public class RedditApiClientTests
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.Unauthorized)]
     [DataRow(HttpStatusCode.NotFound)]
-    public async Task ThrowsHttpRequestExceptionIfMarkMessageAsReadIsUnsuccessful(
+    public async Task MarkMessageAsReadThrowsHttpRequestExceptionIfMarkMessageAsReadIsUnsuccessful(
         HttpStatusCode statusCode)
     {
         HttpClient httpClient =
@@ -95,11 +173,40 @@ public class RedditApiClientTests
     }
 
     [TestMethod]
+    [TestCategory("MarkMessageAsRead")]
+    public async Task MarkMessageAsReadThrowsArgumentNullExceptionIfMessageIsNull()
+    {
+        HttpClient httpClient =
+            new MockHttpClient()
+            .Map(HttpMethod.Post, "/api/read_message", new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK
+            })
+            .GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        var loggerMock = new Mock<ILogger<PeekLinkBotService>>();
+
+        var redditApi =
+            new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                "unused"
+            );
+
+        await Assert.ThrowsAsync<ArgumentNullException>(
+            async () => await redditApi.MarkMessageAsRead(null));
+    }
+
+    [TestMethod]
     [TestCategory("PostComment")]
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.Unauthorized)]
     [DataRow(HttpStatusCode.NotFound)]
-    public async Task ThrowsHttpRequestExceptionIfPostCommentIsUnsuccessful(
+    public async Task PostCommentThrowsHttpRequestExceptionIfPostCommentIsUnsuccessful(
         HttpStatusCode statusCode)
     {
         HttpClient httpClient =
@@ -128,11 +235,69 @@ public class RedditApiClientTests
     }
 
     [TestMethod]
+    [TestCategory("PostComment")]
+    public async Task PostCommentThrowsArgumentExceptionIfMessageIdIsNull()
+    {
+        HttpClient httpClient =
+            new MockHttpClient()
+                .Map(HttpMethod.Post, "/api/comment", new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK
+                })
+                .GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        var loggerMock = new Mock<ILogger<PeekLinkBotService>>();
+
+        var redditApi =
+            new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                "unused"
+            );
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            async () => await redditApi.PostComment(null, "comment"));
+    }
+
+    [TestMethod]
+    [TestCategory("PostComment")]
+    public async Task PostCommentThrowsArgumentExceptionIfMessageContentIsNull()
+    {
+        HttpClient httpClient =
+            new MockHttpClient()
+                .Map(HttpMethod.Post, "/api/comment", new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK
+                })
+                .GetHttpClient();
+
+        this._mockHttpClientFactory
+            .Setup(factory => factory.CreateClient("Reddit"))
+            .Returns(httpClient);
+
+        var loggerMock = new Mock<ILogger<PeekLinkBotService>>();
+
+        var redditApi =
+            new RedditAPI(
+                this._mockHttpClientFactory.Object,
+                this._mockLogger.Object,
+                "unused"
+            );
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            async () => await redditApi.PostComment("message_thing_id", null));
+    }
+
+    [TestMethod]
     [TestCategory("GetUnreadMentions")]
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.Unauthorized)]
     [DataRow(HttpStatusCode.NotFound)]
-    public async Task ThrowsHttpRequestExceptionIfGetUnreadMentionsIsUnsuccessful(
+    public async Task GetUnreadMentionsThrowsHttpRequestExceptionIfGetUnreadMentionsIsUnsuccessful(
         HttpStatusCode statusCode)
     {
         HttpClient httpClient =

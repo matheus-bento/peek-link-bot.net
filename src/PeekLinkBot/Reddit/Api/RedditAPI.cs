@@ -37,6 +37,8 @@ namespace PeekLinkBot.Reddit.Api
 
         public async Task MarkMessageAsRead(Message message)
         {
+            ArgumentNullException.ThrowIfNull(message);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
                     "/api/read_message",
@@ -62,6 +64,8 @@ namespace PeekLinkBot.Reddit.Api
 
         public async Task<Message> GetMessageById(string messageId)
         {
+            ArgumentException.ThrowIfNullOrEmpty(messageId);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.GetAsync(
                     String.Format("/api/info?id={0}", messageId));
@@ -96,6 +100,9 @@ namespace PeekLinkBot.Reddit.Api
 
         public async Task<Message> PostComment(string repliedMessageFullname, string text)
         {
+            ArgumentException.ThrowIfNullOrEmpty(repliedMessageFullname);
+            ArgumentException.ThrowIfNullOrEmpty(text);
+
             HttpResponseMessage response =
                 await this._redditHttpClient.PostAsync(
                     "/api/comment",
