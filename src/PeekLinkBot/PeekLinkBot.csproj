@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PeekLinkBot.Data\PeekLinkBot.Data.csproj" />
-    <ProjectReference Include="..\..\PeekLinkBot.Domain\PeekLinkBot.Domain.csproj" />
+    <ProjectReference Include="..\PeekLinkBot.Data\PeekLinkBot.Data.csproj" />
+    <ProjectReference Include="..\PeekLinkBot.Domain\PeekLinkBot.Domain.csproj" />
   </ItemGroup>
 
 </Project>
