@@ -19,11 +19,15 @@ using PeekLinkBot.Data.Repositories;
 using PeekLinkBot.Domain.UseCases;
 using PeekLinkBot.Domain.Dto;
 using PeekLinkBot.Reddit.Exceptions;
+using PeekLinkBot.Reddit.Auth.Model;
+using PeekLinkBot.Reddit.Model;
 
 namespace PeekLinkBot
 {
     public class PeekLinkBotService : BackgroundService
     {
+        private AccessTokenData _accessTokenData = null;
+
         private readonly ILogger<PeekLinkBotService> _logger;
         private readonly IOptions<PeekLinkBotConfig> _config;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -69,8 +73,18 @@ namespace PeekLinkBot
             {
                 try
                 {
-                    string accessToken = (await this._auth.GetAccessToken()).AccessToken;
-                    var redditApi = new RedditAPI(this._httpClientFactory, this._logger, accessToken);
+                    if (this._accessTokenData == null ||
+                        DateTime.UtcNow >= this._accessTokenData.UtcExpirationDate)
+                    {
+                        this._accessTokenData = await this._auth.GetAccessToken();
+                    }
+
+                    var redditApi =
+                        new RedditAPI(
+                            this._httpClientFactory,
+                            this._logger,
+                            this._accessTokenData.AccessToken
+                        );
 
                     foreach (Message message in await redditApi.GetUnreadMentions())
                     {

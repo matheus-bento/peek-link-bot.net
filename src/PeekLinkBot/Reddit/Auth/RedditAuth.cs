@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using PeekLinkBot.Configuration;
+using PeekLinkBot.Reddit.Model;
 
 namespace PeekLinkBot.Reddit.Auth
 {
@@ -66,7 +67,7 @@ namespace PeekLinkBot.Reddit.Auth
         /// <summary>
         ///     Retrieves the access token to access the bot account
         /// </summary>
-        public async Task<AccessTokenResponseContent> GetAccessToken()
+        public async Task<AccessTokenData> GetAccessToken()
         {
             using (HttpClient httpClient = this.GetHttpClient())
             {
@@ -94,8 +95,15 @@ namespace PeekLinkBot.Reddit.Auth
                 AccessTokenResponseContent content = 
                     JsonConvert.DeserializeObject<AccessTokenResponseContent>(
                         await response.Content.ReadAsStringAsync(), RedditApiSettings.SerializerSettings);
+                
+                DateTime utcResponseDate =
+                    response.Headers.Date?.UtcDateTime ?? DateTime.UtcNow;
 
-                return content;
+                return new AccessTokenData
+                {
+                    AccessToken = content.AccessToken,
+                    UtcExpirationDate = utcResponseDate.AddSeconds(content.ExpiresIn),
+                };
             }
         }
     }
