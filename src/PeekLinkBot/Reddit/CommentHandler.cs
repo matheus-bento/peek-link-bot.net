@@ -16,7 +16,7 @@ namespace PeekLinkBot.Reddit
         ///     Regex to identify any URL
         /// </summary>
         private readonly Regex URL_REGEX = new Regex(
-            @"(?:https?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)");
+            @"(?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&;//=]*)");
 
         private ILogger<PeekLinkBotService> _logger;
         private readonly string _comment;
@@ -40,7 +40,13 @@ namespace PeekLinkBot.Reddit
             foreach (string url in urls)
             {
                 var handler = new UrlHandler();
-                HtmlDocument dom = await new HtmlWeb().LoadFromWebAsync(url);
+
+                var htmlWeb = new HtmlWeb
+                {
+                    UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+                };
+
+                HtmlDocument dom = await htmlWeb.LoadFromWebAsync(url);
 
                 handler.AddScraper(new OpenGraphScraper(dom));
 
