@@ -2,7 +2,7 @@
 {
     public class CommentNotInformedException : Exception
     {
-        private readonly string? _comment = null;
+        private readonly string _comment = null;
         public override string Message
         {
             get {
