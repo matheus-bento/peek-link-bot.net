@@ -26,6 +26,12 @@ namespace PeekLinkBot.Data.Repositories
             return await cursor.FirstOrDefaultAsync();
         }
 
+        public async Task<BotInteraction> GetByRedditId(string redditId)
+        {
+            var cursor = await this._collection.FindAsync(x => x.OriginalComment.RedditId == redditId);
+            return await cursor.FirstOrDefaultAsync();
+        }
+
         public async Task Save(BotInteraction interaction)
         {
             await this._collection.InsertOneAsync(interaction);

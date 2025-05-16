@@ -27,6 +27,11 @@ namespace PeekLinkBot.Tests.Core
             return Task.FromResult(this._interactions.FirstOrDefault(i => i.Id == id));
         }
 
+        public Task<BotInteraction> GetByRedditId(string redditId)
+        {
+            return Task.FromResult(this._interactions.FirstOrDefault(i => i.OriginalComment.RedditId == redditId));
+        }
+
         public Task Save(BotInteraction interaction)
         {
             this._interactions.Add(interaction);
