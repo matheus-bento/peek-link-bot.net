@@ -16,8 +16,23 @@ services:
         condition: service_healthy
     networks:
       - peek-link-bot-network
+  peek-link-bot-api:
+    image: peek-link-bot-api
+    build:
+      context: .
+      dockerfile: src/PeekLinkBot.Api/Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=80
+      - PEEK_LINK_BOT_API_MONGO_DB_CONNECTION_STRING=mongodb://$MONGODB_ROOT_USERNAME:$MONGODB_ROOT_PASSWORD@mongo:27017/
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - peek-link-bot-network
   mongo:
-    image: mongo
+    image: mongo:8-noble
     ports:
       - "27017:27017"
     environment:
