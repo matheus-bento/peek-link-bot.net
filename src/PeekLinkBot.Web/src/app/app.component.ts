@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from "./header/header.component";
+import { InteractionsComponent } from './interactions/interactions.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  imports: [HeaderComponent, InteractionsComponent]
 })
 export class AppComponent {
   title = 'PeekLinkBot.Web';

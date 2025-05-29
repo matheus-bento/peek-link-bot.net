@@ -1,0 +1,24 @@
+@if (interactions().length > 0) {
+    <div id="app-interactions-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Interaction ID</th>
+                    <th>Original Comment Reddit ID</th>
+                    <th>Trigger Comment Reddit ID</th>
+                    <th>Reply Comment Reddit ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (interaction of interactions(); track interaction.id) {
+                    <tr>
+                        <td>{{interaction.id}}</td>
+                        <td>{{interaction.originalComment.redditId}}</td>
+                        <td>{{interaction.triggerComment.redditId}}</td>
+                        <td>{{interaction.replyComment.redditId}}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

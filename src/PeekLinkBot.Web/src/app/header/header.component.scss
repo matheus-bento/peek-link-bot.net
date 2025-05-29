@@ -1,0 +1,21 @@
+@use "../../shared/css/variables" as *;
+ul {
+    display: flex;
+    flex-direction: row;
+
+    margin: 0;
+    
+    height: $header-height;
+    background-color: $main-color;
+
+    li {
+        list-style: none;
+        margin: auto 0;
+
+        font-family: $font-family;
+        font-size: 24px;
+        font-weight: bold;
+
+        color: #FFF;
+    }
+}
